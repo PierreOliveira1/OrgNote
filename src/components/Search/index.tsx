@@ -20,16 +20,15 @@ const Search = ({ placeholder, onChangeText, value }: Props): JSX.Element => {
 	return (
 		<Box
 			style={{
-				shadowColor: '#000',
+				shadowColor: 'rgba(0, 0, 0, 0.12)',
 				shadowOffset: {
 					width: 2,
 					height: 4,
 				},
-				shadowOpacity: 0.12,
 				elevation: 5,
 				borderRadius: 14,
-				backgroundColor: '#FFF',
 			}}
+			bg="background.primary"
 		>
 			<Input
 				ref={input}
@@ -43,7 +42,7 @@ const Search = ({ placeholder, onChangeText, value }: Props): JSX.Element => {
 							marginRight={0}
 						/>
 					) : (
-						<></>
+						<Box />
 					)
 				}
 				InputRightElement={
@@ -60,7 +59,7 @@ const Search = ({ placeholder, onChangeText, value }: Props): JSX.Element => {
 				onChangeText={onChangeText}
 				onFocus={() => setChange(true)}
 				onBlur={() => setChange(false)}
-				bg="input.white"
+				bg="background.primary"
 				_focus={{ borderColor: 'transparent' }}
 				width="90%"
 				height={60}
