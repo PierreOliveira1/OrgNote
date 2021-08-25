@@ -8,3 +8,11 @@ export const Container = styled.View`
 	justify-content: center;
 	background-color: #fafafa;
 `;
+
+export const Box = styled.View<{
+	width?: string | number;
+	height?: string | number;
+}>`
+	width: ${(props) => props.width || 'auto'};
+	height: ${(props) => props.height || 'auto'};
+`;

@@ -2,11 +2,11 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
+import { NativeBaseProvider } from 'native-base';
+import Theme from './src/styles/Theme';
 
 // Routes
 import Routes from './src/routes';
-
-import { NativeBaseProvider } from 'native-base';
 
 const App = () => {
 	const [isLoadedFonts] = useFonts({
@@ -19,7 +19,7 @@ const App = () => {
 	return (
 		<>
 			<StatusBar translucent backgroundColor="transparent" style="dark" />
-			<NativeBaseProvider>
+			<NativeBaseProvider theme={Theme}>
 				<Routes />
 			</NativeBaseProvider>
 		</>
