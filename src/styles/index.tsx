@@ -1,18 +1,13 @@
 import styled from 'styled-components/native';
 
-export const Container = styled.View`
+export const Container = styled.View<{
+	justifyContent?: string;
+	alignItems?: string;
+}>`
 	flex: 1;
 	width: 100%;
 	height: 100%;
-	align-items: center;
-	justify-content: center;
+	justify-content: ${(props) => props.justifyContent || 'flex-start'};
+	align-items: ${(props) => props.alignItems || 'flex-start'};
 	background-color: #fafafa;
-`;
-
-export const Box = styled.View<{
-	width?: string | number;
-	height?: string | number;
-}>`
-	width: ${(props) => props.width || 'auto'};
-	height: ${(props) => props.height || 'auto'};
 `;

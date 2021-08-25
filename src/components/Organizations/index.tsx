@@ -5,6 +5,7 @@ import { Box, Image, Text } from 'native-base';
 import Button from '../Button';
 
 interface Org {
+	login?: string;
 	name?: string;
 	avatar_url?: string;
 	description?: string;
@@ -20,7 +21,7 @@ const Organizations = ({ org, alt }: Props): JSX.Element => {
 
 	return (
 		<Box
-			width="90%"
+			width="100%"
 			height="auto"
 			minHeight="85px"
 			bg="background.primary"
@@ -35,6 +36,7 @@ const Organizations = ({ org, alt }: Props): JSX.Element => {
 				},
 				elevation: 3,
 			}}
+			marginTop="10px"
 		>
 			<Box width="100%" flexDirection="row">
 				<Image
@@ -50,8 +52,9 @@ const Organizations = ({ org, alt }: Props): JSX.Element => {
 						fontSize={16}
 						fontFamily="Arimo-Regular"
 						color="text.secondary"
+						textTransform="capitalize"
 					>
-						{org.name}
+						{org.name || org.login}
 					</Text>
 					{org.description && (
 						<Text

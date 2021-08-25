@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Text } from 'react-native';
+
+// Services
+import { searchOrg } from '../../service/api';
+
+// Components
 import Organizations from '../../components/Organizations';
 import Search from '../../components/Search';
-import { searchOrg } from '../../service/api';
 
 // Styles
 import { Container } from '../../styles';
+import ListOrganizations from '../../components/ListOrganizations';
 
 const Home = () => {
 	const [org, setOrg] = useState({});
@@ -15,12 +19,12 @@ const Home = () => {
 			const fetchOrg = await searchOrg('Microsoft');
 			setOrg(fetchOrg);
 		})();
-		console.log(org);
 	}, []);
 
 	return (
-		<Container>
-			<Organizations org={org} alt="teste" />
+		<Container alignItems="center">
+			<Search placeholder="Procurar organizações..." marginTop="15%" />
+			<ListOrganizations />
 		</Container>
 	);
 };

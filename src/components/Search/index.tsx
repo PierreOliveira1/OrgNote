@@ -11,9 +11,15 @@ interface Props {
 	placeholder: string;
 	onChangeText?: any;
 	value?: string;
+	marginTop?: string | number;
 }
 
-const Search = ({ placeholder, onChangeText, value }: Props): JSX.Element => {
+const Search = ({
+	placeholder,
+	onChangeText,
+	value,
+	marginTop,
+}: Props): JSX.Element => {
 	const [change, setChange] = useState(false);
 	const input = useRef(null);
 
@@ -25,10 +31,11 @@ const Search = ({ placeholder, onChangeText, value }: Props): JSX.Element => {
 					width: 2,
 					height: 4,
 				},
-				elevation: 5,
+				elevation: 3,
 				borderRadius: 14,
 			}}
 			bg="background.primary"
+			marginTop={marginTop}
 		>
 			<Input
 				ref={input}
@@ -57,6 +64,7 @@ const Search = ({ placeholder, onChangeText, value }: Props): JSX.Element => {
 				}
 				placeholder={placeholder}
 				onChangeText={onChangeText}
+				value={value}
 				onFocus={() => setChange(true)}
 				onBlur={() => setChange(false)}
 				bg="background.primary"

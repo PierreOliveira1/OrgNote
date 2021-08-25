@@ -1,11 +1,5 @@
 const BASE_URL = 'https://api.github.com';
 
-interface Org {
-	name: string;
-	avatar_url: string;
-	description: string;
-}
-
 const searchOrg = async (org: string) => {
 	try {
 		const data = await fetch(`${BASE_URL}/orgs/${org}`);
@@ -20,6 +14,21 @@ const searchOrg = async (org: string) => {
 	}
 };
 
+const getOrganizations = async () => {
+	try {
+		const data = await fetch(`${BASE_URL}/organizations`);
+		const json = await data.json();
+
+		if(json.message)
+			return { error: 'Error capturing organizations' };
+
+		return json;
+	} catch (e) {
+		return { error: 'Error capturing organizations' };
+	}
+};
+
 export {
-	searchOrg
+	searchOrg,
+	getOrganizations
 };
