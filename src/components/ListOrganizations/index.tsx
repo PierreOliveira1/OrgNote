@@ -3,20 +3,18 @@ import { Box, FlatList, Icon, Text } from 'native-base';
 
 // Icons
 import { Emphasis } from '../../utils/icons';
-import { getOrganizations } from '../../service/api';
-import Organizations from '../Organizations';
+
+// Components
+import Organizations from '../Organization';
+
+// Types
 import { Org } from '../../types';
 
-const ListOrganizations = () => {
-	const [orgs, setOrgs] = useState<Org[] | undefined[]>([]);
+interface Props {
+	orgs: Org[];
+}
 
-	useEffect(() => {
-		(async () => {
-			const data = await getOrganizations();
-			setOrgs(data);
-		})();
-	}, []);
-
+const ListOrganizations = ({ orgs }: Props): JSX.Element => {
 	return (
 		<Box width="100%" marginTop="10%" alignItems="center">
 			<Icon as={<Emphasis />} marginBottom="10px" />
@@ -28,12 +26,20 @@ const ListOrganizations = () => {
 			</Text>
 			<FlatList
 				width="100%"
+				height="60%"
 				contentContainerStyle={{
 					alignItems: 'center',
 				}}
+				marginTop="10px"
 				data={orgs}
-				keyExtractor={(item) => item.name}
-				renderItem={({ item }) => <Organizations org={item} alt={item.login} />}
+				keyExtractor={(_, index) => index.toString()}
+				renderItem={({ item, index }) => (
+					<Organizations
+						org={item}
+						alt={item.login}
+						marginBottom={index === orgs.length - 1 ? '5px' : '0px'}
+					/>
+				)}
 			/>
 		</Box>
 	);

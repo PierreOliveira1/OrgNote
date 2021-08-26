@@ -1,23 +1,46 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Image, Text } from 'native-base';
 
 // Components
 import Button from '../Button';
 
-interface Org {
-	login?: string;
-	name?: string;
-	avatar_url?: string;
-	description?: string;
-}
+// Services
+import {
+	deleteSavedOrganization,
+	getSavedOrganizations,
+	savedOrganization,
+} from '../../service/storage';
+
+// Types
+import { Org } from '../../types';
 
 interface Props {
 	org: Org;
 	alt: string;
+	marginBottom?: string | number;
 }
 
-const Organizations = ({ org, alt }: Props): JSX.Element => {
+const Organization = ({ org, alt, marginBottom }: Props): JSX.Element => {
 	const [saved, setSaved] = useState(false);
+
+	useEffect(() => {
+		(async () => {
+			try {
+				const orgs: Org[] = await getSavedOrganizations();
+				orgs.filter((data: Org) => data.login === org.login && setSaved(true));
+			} catch (e) {}
+		})();
+	}, []);
+
+	const onPress = async () => {
+		if (!saved) {
+			await savedOrganization(org);
+			setSaved(true);
+		} else {
+			await deleteSavedOrganization(org);
+			setSaved(false);
+		}
+	};
 
 	return (
 		<Box
@@ -37,6 +60,7 @@ const Organizations = ({ org, alt }: Props): JSX.Element => {
 				elevation: 3,
 			}}
 			marginTop="10px"
+			marginBottom={marginBottom}
 		>
 			<Box width="100%" flexDirection="row">
 				<Image
@@ -75,10 +99,10 @@ const Organizations = ({ org, alt }: Props): JSX.Element => {
 				position="absolute"
 				right={14}
 				bottom={14}
-				onPress={() => setSaved(!saved)}
+				onPress={onPress}
 			/>
 		</Box>
 	);
 };
 
-export default Organizations;
+export default Organization;

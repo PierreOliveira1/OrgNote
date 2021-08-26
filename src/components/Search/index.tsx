@@ -1,83 +1,39 @@
-import React, { useState, useRef } from 'react';
-import { Box, Input } from 'native-base';
+import React from 'react';
+import { Box, Icon, Text } from 'native-base';
 
 // Icons
-import { ArrowLeft, Search as IconSearch } from '../../utils/icons';
+import { EmojiSad } from '../../utils/icons';
 
 // Components
-import Button from '../Button';
+import Organization from '../Organization';
+
+// Types
+import { Org } from '../../types';
 
 interface Props {
-	placeholder: string;
-	onChangeText?: any;
-	value?: string;
-	marginTop?: string | number;
+	org?: Org;
+	error?: boolean;
 }
 
-const Search = ({
-	placeholder,
-	onChangeText,
-	value,
-	marginTop,
-}: Props): JSX.Element => {
-	const [change, setChange] = useState(false);
-	const input = useRef(null);
-
+const Search = ({ org, error }: Props): JSX.Element => {
 	return (
-		<Box
-			style={{
-				shadowColor: 'rgba(0, 0, 0, 0.12)',
-				shadowOffset: {
-					width: 2,
-					height: 4,
-				},
-				elevation: 3,
-				borderRadius: 14,
-			}}
-			bg="background.primary"
-			marginTop={marginTop}
-		>
-			<Input
-				ref={input}
-				InputLeftElement={
-					change ? (
-						<Button
-							type="icon"
-							icon={<ArrowLeft />}
-							size={8}
-							onPress={() => input?.current?.blur()}
-							marginRight={0}
-						/>
-					) : (
-						<Box />
-					)
-				}
-				InputRightElement={
-					<Button
-						type="icon"
-						icon={<IconSearch />}
-						onPress={() => {
-							alert('teste');
-						}}
-						marginLeft={0}
-					/>
-				}
-				placeholder={placeholder}
-				onChangeText={onChangeText}
-				value={value}
-				onFocus={() => setChange(true)}
-				onBlur={() => setChange(false)}
-				bg="background.primary"
-				_focus={{ borderColor: 'transparent' }}
-				width="90%"
-				height={60}
-				borderRadius={14}
-				fontSize={16}
-				fontFamily="Arimo-Regular"
-				placeholderTextColor="#969696"
-				borderColor="transparent"
-				p={15}
-			/>
+		<Box width="90%" alignItems="center" marginTop="10%">
+			{error ? (
+				<Box width="90%" alignItems="center">
+					<Icon as={<EmojiSad />} />
+					<Text
+						color="text.tertiary"
+						fontSize={16}
+						fontFamily="Arimo-Regular"
+						textAlign="center"
+						marginTop={2}
+					>
+						Oops! Não encontramos organizações com este nome.
+					</Text>
+				</Box>
+			) : (
+				<Organization org={org} alt={org.login || String(Date.now())} />
+			)}
 		</Box>
 	);
 };

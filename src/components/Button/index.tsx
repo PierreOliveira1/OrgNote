@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { Icon, Pressable, Text } from 'native-base';
+import { Link } from '@react-navigation/native';
 
 // Icons
 import { SavedBlue, SavedWhite } from '../../utils/icons';
@@ -14,6 +15,7 @@ interface Props {
 	height?: string | number;
 	justifyContent?: string;
 	alignItems?: string;
+	flexDirection?: string;
 	marginLeft?: string | number;
 	marginRight?: string | number;
 	position?: string;
@@ -21,6 +23,8 @@ interface Props {
 	bottom?: string | number;
 	left?: string | number;
 	right?: string | number;
+	bg?: string;
+	borderRadius?: string | number;
 }
 
 const Button: FC<Props> = ({
@@ -34,6 +38,7 @@ const Button: FC<Props> = ({
 	height,
 	justifyContent,
 	alignItems,
+	flexDirection,
 	marginLeft,
 	marginRight,
 	position,
@@ -41,6 +46,8 @@ const Button: FC<Props> = ({
 	bottom,
 	left,
 	right,
+	bg,
+	borderRadius,
 }) => {
 	if (type === 'icon')
 		return (
@@ -93,8 +100,17 @@ const Button: FC<Props> = ({
 			height={height || 'auto'}
 			justifyContent={justifyContent || 'center'}
 			alignItems={alignItems || 'center'}
+			flexDirection={flexDirection || 'row'}
+			position={position}
+			top={top}
+			bottom={bottom}
+			left={left}
+			right={right}
 			marginLeft={marginLeft || 0}
 			marginRight={marginRight || 0}
+			bg={bg}
+			borderRadius={borderRadius || 39}
+			onPress={onPress}
 		>
 			{children}
 		</Pressable>
