@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Icon, Text } from 'native-base';
+import { Box, Icon, Text } from 'native-base';
 import { TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
@@ -17,7 +17,7 @@ import Search from '../../components/Search';
 import { Container } from '../../styles';
 
 // Icons
-import { ArrowRightWhite } from '../../utils/icons';
+import { ArrowRightWhite, Emphasis } from '../../utils/icons';
 
 // Types
 import { Org } from '../../types';
@@ -61,7 +61,16 @@ const Home: React.FC<Props> = ({ navigation }) => {
 					value={textInput}
 				/>
 				{textInput === '' ? (
-					<ListOrganizations orgs={organizations} />
+					<Box width="100%" marginTop="10%" alignItems="center">
+						<Icon as={<Emphasis />} marginBottom="10px" />
+						<Text fontSize={22} fontFamily="Arimo-Medium">
+							Organizações em destaque
+						</Text>
+						<Text fontSize={15} fontFamily="Arimo-Regular">
+							Veja as organizações em tendência no GitHub.
+						</Text>
+						<ListOrganizations orgs={organizations} />
+					</Box>
 				) : (
 					<Search org={org} error={error} />
 				)}

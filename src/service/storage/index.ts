@@ -25,8 +25,22 @@ const deleteSavedOrganization = async (org: Org) => {
 	} catch(e) {}
 };
 
+const searchSavedOrganization = async (org: string) => {
+	try {
+		const orgs: Org[] = await getSavedOrganizations();
+		const searchOrg = orgs.filter((data: Org) => data.login === org || data.name === org);
+		const [response] = searchOrg;
+		if(!response)
+			return { error: 'Error searching organization' }
+		return response;
+	} catch(e) {
+		return { error: 'Error searching organization' }
+	}
+};
+
 export {
 	getSavedOrganizations,
 	savedOrganization,
-	deleteSavedOrganization
+	deleteSavedOrganization,
+	searchSavedOrganization
 };

@@ -12,21 +12,15 @@ import { Org } from '../../types';
 
 interface Props {
 	orgs: Org[];
+	height?: string | number;
 }
 
-const ListOrganizations = ({ orgs }: Props): JSX.Element => {
+const ListOrganizations = ({ orgs, height }: Props): JSX.Element => {
 	return (
-		<Box width="100%" marginTop="10%" alignItems="center">
-			<Icon as={<Emphasis />} marginBottom="10px" />
-			<Text fontSize={22} fontFamily="Arimo-Medium">
-				Organizações em destaque
-			</Text>
-			<Text fontSize={15} fontFamily="Arimo-Regular">
-				Veja as organizações em tendência no GitHub.
-			</Text>
+		<Box width="100%" alignItems="center">
 			<FlatList
 				width="100%"
-				height="60%"
+				height={height || '70%'}
 				contentContainerStyle={{
 					alignItems: 'center',
 				}}
