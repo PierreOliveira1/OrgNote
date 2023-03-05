@@ -1,79 +1,73 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Icon, Text } from 'native-base';
+import React, { useCallback, useState } from 'react';
+import { Icon, Text } from 'native-base';
 import { TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
-
-// Services
-import { getOrganizations, searchOrg } from '../../service/api';
 
 // Components
-import InputSearch from '../../components/InputSearch';
-import ListOrganizations from '../../components/ListOrganizations';
+import { InputSearch } from '../../components/InputSearch';
+import { ListOrganizations } from '../../components/ListOrganizations';
 import Button from '../../components/Button';
-import Search from '../../components/Search';
 
 // Styles
 import { Container } from '../../styles';
 
 // Icons
-import { ArrowRightWhite, Emphasis } from '../../utils/icons';
+import { ArrowRightWhite } from '../../utils/icons';
 
 // Types
 import { Org } from '../../types';
+import { useInputSearchState } from '../../store/inputSearchState';
+import { useQuery, useQueryClient } from 'react-query';
+import { Loading } from '../../components/Loading';
 
 interface Props {
-	navigation: NativeStackNavigationProp<any, any>;
+	navigation: NativeStackNavigationProp<{ SAVED: undefined }, 'SAVED'>;
 }
 
 const Home: React.FC<Props> = ({ navigation }) => {
-	const [textInput, setTextInput] = useState('');
+	const queryClient = useQueryClient();
+	const { inputSearch, setInputSearch } = useInputSearchState();
 	const [error, setError] = useState(false);
-	const [organizations, setOrganizations] = useState<Org[]>([]);
-	const [org, setOrg] = useState({});
 
-	useEffect(() => {
-		(async () => {
-			const data = await getOrganizations();
-			setOrganizations(data);
-		})();
-	}, []);
+	const orgs = useQuery<Org | Org[], Error>(
+		['organizations', { inputSearch }],
+		async () => {
+			const query =
+				inputSearch === '' ? 'organizations' : `orgs/${inputSearch}`;
+			const response = await fetch('https://api.github.com/' + query);
+			const data: Org | Org[] = await response.json();
 
-	useEffect(() => {
-		(async () => {
-			const getOrg: any = await searchOrg(textInput);
-			if (getOrg.error) {
-				return setError(true);
-			} else {
-				setError(false);
-				return setOrg(getOrg);
-			}
-		})();
-	}, [textInput]);
+			return data;
+		},
+		{
+			onError() {
+				if (!error) setError(true);
+			},
+			onSuccess() {
+				if (error) setError(false);
+			},
+		},
+	);
+
+	const handleSearch = useCallback(() => {
+		if (inputSearch !== '') {
+			queryClient.invalidateQueries({ queryKey: 'organizations' });
+		}
+	}, [inputSearch]);
 
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 			<Container alignItems="center">
 				<InputSearch
 					placeholder="Procurar organizações..."
-					marginTop="15%"
-					onChangeText={setTextInput}
-					value={textInput}
+					type="search"
+					onChangeText={(text) => {
+						setInputSearch(text);
+					}}
+					onPressRightElement={handleSearch}
 				/>
-				{textInput === '' ? (
-					<Box width="100%" marginTop="10%" alignItems="center">
-						<Icon as={<Emphasis />} marginBottom="10px" />
-						<Text fontSize={22} fontFamily="Arimo-Medium">
-							Organizações em destaque
-						</Text>
-						<Text fontSize={15} fontFamily="Arimo-Regular">
-							Veja as organizações em tendência no GitHub.
-						</Text>
-						<ListOrganizations orgs={organizations} />
-					</Box>
-				) : (
-					<Search org={org} error={error} />
-				)}
+				{orgs.isLoading && <Loading />}
+				{orgs.isSuccess && <ListOrganizations orgs={orgs.data} error={error} />}
 				<Button
 					width={190}
 					height={49}

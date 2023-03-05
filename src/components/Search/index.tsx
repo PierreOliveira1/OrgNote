@@ -5,13 +5,13 @@ import { Box, Icon, Text } from 'native-base';
 import { EmojiSad } from '../../utils/icons';
 
 // Components
-import Organization from '../Organization';
+import { Organization } from '../Organization';
 
 // Types
 import { Org } from '../../types';
 
 interface Props {
-	org?: Org;
+	org: Org;
 	error?: boolean;
 }
 
@@ -32,7 +32,7 @@ const Search = ({ org, error }: Props): JSX.Element => {
 					</Text>
 				</Box>
 			) : (
-				<Organization org={org} alt={org.login || String(Date.now())} />
+				<Organization org={org} alt="Logo da organização" />
 			)}
 		</Box>
 	);

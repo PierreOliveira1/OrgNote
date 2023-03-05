@@ -9,7 +9,7 @@ import {
 	deleteSavedOrganization,
 	getSavedOrganizations,
 	savedOrganization,
-} from '../../service/storage';
+} from '../../services/storage';
 
 // Types
 import { Org } from '../../types';
@@ -18,27 +18,37 @@ interface Props {
 	org: Org;
 	alt: string;
 	marginBottom?: string | number;
+	isSaved?: boolean;
 }
 
-const Organization = ({ org, alt, marginBottom }: Props): JSX.Element => {
-	const [saved, setSaved] = useState(false);
+const Organization = ({
+	org,
+	alt,
+	marginBottom,
+	isSaved,
+}: Props): JSX.Element => {
+	const [saved, setSaved] = useState(isSaved ?? false);
+
+	async function getSaved() {
+		try {
+			const orgs: Org[] = await getSavedOrganizations();
+			orgs.find((data: Org) => data.login === org.login) && setSaved(true);
+		} catch (e) {
+			throw new Error('Error to get saved organizations');
+		}
+	}
 
 	useEffect(() => {
-		(async () => {
-			try {
-				const orgs: Org[] = await getSavedOrganizations();
-				orgs.filter((data: Org) => data.login === org.login && setSaved(true));
-			} catch (e) {}
-		})();
+		if (!isSaved) getSaved();
 	}, []);
 
 	const onPress = async () => {
 		if (!saved) {
-			await savedOrganization(org);
 			setSaved(true);
+			await savedOrganization(org);
 		} else {
-			await deleteSavedOrganization(org);
 			setSaved(false);
+			await deleteSavedOrganization(org);
 		}
 	};
 
@@ -78,7 +88,7 @@ const Organization = ({ org, alt, marginBottom }: Props): JSX.Element => {
 						color="text.secondary"
 						textTransform="capitalize"
 					>
-						{org.name || org.login}
+						{`${org.login}`}
 					</Text>
 					{org.description && (
 						<Text
@@ -105,4 +115,4 @@ const Organization = ({ org, alt, marginBottom }: Props): JSX.Element => {
 	);
 };
 
-export default Organization;
+export { Organization };

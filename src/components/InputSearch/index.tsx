@@ -1,150 +1,108 @@
-import React, { useState, useRef } from 'react';
-import { Box, Input } from 'native-base';
-
-// Icons
-import { ArrowLeft, Cancel, Search as IconSearch } from '../../utils/icons';
-
-// Components
+import React, { memo, useRef, useState } from 'react';
+import {
+	NativeSyntheticEvent,
+	TextInputFocusEventData,
+	TextInputProps,
+} from 'react-native';
+import { TextInput } from 'react-native';
+import { ArrowLeft, Cancel, Search } from '../../utils/icons';
 import Button from '../Button';
 
-interface Props {
-	placeholder: string;
-	onChangeText?: any;
-	onFocus?: any;
-	onBlur?: any;
-	onPress?: any;
-	value?: string;
-	marginTop?: string | number;
-	type?: string;
+import * as Styles from './styles';
+
+interface Props extends TextInputProps {
+	type?: 'search' | 'saved';
+	onPressRightElement?: () => void;
+	onPressLeftElement?: () => void;
 }
 
-const InputSearch = ({
-	placeholder,
-	onChangeText,
-	onFocus,
-	onBlur,
-	onPress,
-	value,
-	marginTop,
-	type,
-}: Props): JSX.Element => {
-	const [change, setChange] = useState(false);
-	const input = useRef(null);
+function InputSearchComponent(props: Props) {
+	const {
+		type,
+		onFocus,
+		onBlur,
+		onChangeText,
+		onPressRightElement,
+		onPressLeftElement,
+		...rest
+	} = props;
+	const [isFocused, setIsFocused] = useState(false);
+	const inputRef = useRef<TextInput>(null);
+	const [value, setValue] = useState<string>('');
 
-	if (type === 'saved')
-		return (
-			<Box
-				style={{
-					shadowColor: 'rgba(0, 0, 0, 0.12)',
-					shadowOffset: {
-						width: 2,
-						height: 4,
-					},
-					elevation: 3,
-					borderRadius: 14,
-				}}
-				bg="background.primary"
-				marginTop={marginTop}
-			>
-				<Input
-					ref={input}
-					InputRightElement={
-						<Button
-							type="icon"
-							icon={<Cancel />}
-							onPress={onPress}
-							marginLeft={0}
-						/>
-					}
-					placeholder={placeholder}
-					onChangeText={onChangeText}
-					value={value}
-					onFocus={() => {
-						setChange(true);
-						if (onFocus) onFocus();
-					}}
-					onBlur={() => {
-						setChange(false);
-						if (onBlur) onBlur();
-					}}
-					bg="background.primary"
-					_focus={{ borderColor: 'transparent' }}
-					width="90%"
-					height={60}
-					borderRadius={14}
-					fontSize={16}
-					fontFamily="Arimo-Regular"
-					placeholderTextColor="#969696"
-					borderColor="transparent"
-					p={15}
-				/>
-			</Box>
-		);
+	function handleWidth(): string {
+		if (value?.length ?? isFocused) return '80%';
+		return '90%';
+	}
+
+	const isLeftElementSearch = value?.length ?? isFocused ? true : false;
 
 	return (
-		<Box
-			style={{
-				shadowColor: 'rgba(0, 0, 0, 0.12)',
-				shadowOffset: {
-					width: 2,
-					height: 4,
-				},
-				elevation: 3,
-				borderRadius: 14,
-			}}
-			bg="background.primary"
-			marginTop={marginTop}
-		>
-			<Input
-				ref={input}
-				InputLeftElement={
-					change ? (
-						<Button
-							type="icon"
-							icon={<ArrowLeft />}
-							size={8}
-							onPress={() => {
-								input?.current?.blur();
-								onChangeText('');
-							}}
-							marginRight={0}
-						/>
-					) : (
-						<Box />
-					)
-				}
-				InputRightElement={
+		<Styles.Container>
+			{isLeftElementSearch && (
+				<Styles.BoxIcon>
 					<Button
 						type="icon"
-						icon={<IconSearch />}
-						onPress={() => input?.current?.blur()}
+						icon={<ArrowLeft />}
+						size={7}
+						onPress={() => {
+							setIsFocused(false);
+							setValue('');
+							if (inputRef && 'current' in inputRef) {
+								inputRef.current?.clear();
+								inputRef.current?.blur();
+							}
+							onPressLeftElement && onPressLeftElement();
+							onChangeText && onChangeText('');
+						}}
+						marginRight={0}
+					/>
+				</Styles.BoxIcon>
+			)}
+			<Styles.TextInput
+				ref={inputRef}
+				width={handleWidth()}
+				isFocused={value?.length ?? isFocused}
+				placeholderTextColor="#969696"
+				onFocus={(event: NativeSyntheticEvent<TextInputFocusEventData>) => {
+					setIsFocused(true);
+					onFocus && onFocus(event);
+				}}
+				onBlur={(event: NativeSyntheticEvent<TextInputFocusEventData>) => {
+					setIsFocused(false);
+					onBlur && onBlur(event);
+				}}
+				onChangeText={(text: string) => {
+					setValue(text);
+					onChangeText && onChangeText(text);
+				}}
+				defaultValue={value}
+				{...rest}
+			/>
+			<Styles.BoxIcon>
+				{type === 'search' && (
+					<Button
+						type="icon"
+						icon={<Search />}
+						size={6}
+						onPress={onPressRightElement}
 						marginLeft={0}
 					/>
-				}
-				placeholder={placeholder}
-				onChangeText={onChangeText}
-				value={value}
-				onFocus={() => {
-					setChange(true);
-					if (onFocus) onFocus();
-				}}
-				onBlur={() => {
-					setChange(false);
-					if (onBlur) onBlur();
-				}}
-				bg="background.primary"
-				_focus={{ borderColor: 'transparent' }}
-				width="90%"
-				height={60}
-				borderRadius={14}
-				fontSize={16}
-				fontFamily="Arimo-Regular"
-				placeholderTextColor="#969696"
-				borderColor="transparent"
-				p={15}
-			/>
-		</Box>
+				)}
+				{type === 'saved' && (
+					<Button
+						type="icon"
+						icon={<Cancel />}
+						size={6}
+						marginLeft={0}
+						onPress={onPressRightElement}
+					/>
+				)}
+			</Styles.BoxIcon>
+		</Styles.Container>
 	);
-};
+}
 
-export default InputSearch;
+const InputSearch = memo(InputSearchComponent);
+
+export { InputSearch };

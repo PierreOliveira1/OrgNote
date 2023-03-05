@@ -4,22 +4,23 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 // Components
 import Button from '../../components/Button';
-import InputSearch from '../../components/InputSearch';
+import { InputSearch } from '../../components/InputSearch';
 import Search from '../../components/Search';
-import ListOrganizations from '../../components/ListOrganizations';
+import { ListOrganizations } from '../../components/ListOrganizations';
 
 // Services
 import {
 	getSavedOrganizations,
 	searchSavedOrganization,
-} from '../../service/storage';
+} from '../../services/storage';
 
 // Styles
-import { Container } from '../../styles';
+import { Container } from '../../styles/index';
 
 // Icons
 import { ArrowLeft, SavedGray, Search as IconSearch } from '../../utils/icons';
 import { Org } from '../../types';
+import { Loading } from '../../components/Loading';
 
 interface Props {
 	navigation: NativeStackNavigationProp<any, any>;
@@ -28,26 +29,38 @@ interface Props {
 const Saved = ({ navigation }: Props): JSX.Element => {
 	const [isInput, setIsInput] = useState(false);
 	const [textInput, setTextInput] = useState('');
-	const [organizations, setOrganizations] = useState([]);
-	const [org, setOrg] = useState<Org>({});
+	const [organizations, setOrganizations] = useState<Org[]>([]);
 	const [error, setError] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		(async () => {
+			setIsLoading(true);
 			const data = await getSavedOrganizations();
 			setOrganizations(data);
+			setIsLoading(false);
 		})();
 	}, []);
 
 	useEffect(() => {
 		(async () => {
-			const getOrg: any = await searchSavedOrganization(textInput);
-			if (getOrg.error) {
-				return setError(true);
+			setIsLoading(true);
+			if (textInput.length === 0) {
+				const data = await getSavedOrganizations();
+				setOrganizations(data);
+				setError(false);
+				setIsLoading(false);
+				return;
+			}
+
+			const getOrg = await searchSavedOrganization(textInput);
+			if ('error' in getOrg) {
+				setError(true);
 			} else {
 				setError(false);
-				return setOrg(getOrg);
+				setOrganizations(getOrg);
 			}
+			setIsLoading(false);
 		})();
 	}, [textInput]);
 
@@ -58,11 +71,11 @@ const Saved = ({ navigation }: Props): JSX.Element => {
 				justifyContent="space-between"
 				alignItems="center"
 				flexDirection="row"
-				marginTop="10%"
 			>
 				<Button
 					type="icon"
 					icon={<ArrowLeft />}
+					size={7}
 					onPress={() => navigation.goBack()}
 				/>
 				<Text fontSize={16} fontFamily="Arimo-Regular" color="#000">
@@ -71,40 +84,63 @@ const Saved = ({ navigation }: Props): JSX.Element => {
 				<Button
 					type="icon"
 					icon={<IconSearch />}
+					size={7}
 					onPress={() => setIsInput(!isInput)}
 				/>
 			</Box>
-			{isInput && (
-				<InputSearch
-					type="saved"
-					onPress={() => {
-						setIsInput(!isInput);
-						setTextInput('');
-					}}
-					placeholder="Procurar organizações..."
-					onChangeText={setTextInput}
-					value={textInput}
-				/>
-			)}
-			{textInput === '' ? (
-				organizations.length !== 0 ? (
-					<ListOrganizations height="100%" orgs={organizations} />
+			<Box
+				width="100%"
+				height="100%"
+				alignItems="center"
+				justifyContent="space-between"
+			>
+				{isInput && (
+					<InputSearch
+						type="saved"
+						onPressRightElement={() => {
+							setIsInput(!isInput);
+							setTextInput('');
+						}}
+						placeholder="Procurar organizações..."
+						onChangeText={setTextInput}
+					/>
+				)}
+				{!isLoading ? (
+					<>
+						{organizations.length !== 0 ? (
+							<>
+								<ListOrganizations
+									orgs={organizations}
+									saved
+									height={!isInput ? '100%' : undefined}
+								/>
+								{isLoading && <Loading />}
+							</>
+						) : (
+							<Box
+								width="80%"
+								height="100%"
+								justifyContent="center"
+								alignItems="center"
+								flexDirection="row"
+							>
+								<Text
+									textAlign="center"
+									fontSize={16}
+									fontFamily="Arimo-Regular"
+									color="#636363"
+								>
+									Sua lista de organizações está vazia. Clique no ícon
+									<SavedGray width={16} height={16} /> para salvar uma
+									organização
+								</Text>
+							</Box>
+						)}
+					</>
 				) : (
-					<Box width="80%" flexDirection="row">
-						<Text
-							textAlign="center"
-							fontSize={16}
-							fontFamily="Arimo-Regular"
-							color="#636363"
-						>
-							Sua lista de organizações está vazia. Clique no ícon
-							<SavedGray width={16} height={16} /> para salvar uma organização
-						</Text>
-					</Box>
-				)
-			) : (
-				<Search org={org} error={error} />
-			)}
+					<Loading />
+				)}
+			</Box>
 		</Container>
 	);
 };
